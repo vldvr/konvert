@@ -1,0 +1,32 @@
+[package]
+name = "konvert"
+version = "0.1.0"
+description = "Шифрование файлов перетаскиванием (формат age)"
+edition = "2021"
+
+[lib]
+name = "konvert_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+age = { version = "0.11", features = ["armor"] }
+keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
+trash = "5"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true
+
+# scrypt в отладочной сборке без оптимизаций идёт десятки секунд
+[profile.dev.package."*"]
+opt-level = 3

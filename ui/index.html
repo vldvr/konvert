@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Конверт</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-os="mac">
+  <div class="titlebar" data-tauri-drag-region>
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="main">Конверт</button>
+      <button role="tab" aria-selected="false" data-tab="keys">Ключи</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <section class="view on" id="v-main">
+      <div class="stage drop-target" id="stage" tabindex="0" role="button" aria-label="Выбрать файл">
+        <svg class="env" id="env" data-s="empty" viewBox="0 -30 250 210" aria-hidden="true">
+          <defs>
+            <clipPath id="cl"><rect x="0" y="0" width="125" height="200"/></clipPath>
+            <clipPath id="cr"><rect x="125" y="0" width="125" height="200"/></clipPath>
+          </defs>
+          <ellipse class="shadow" cx="125" cy="174" rx="104" ry="6"/>
+          <rect class="back" x="12" y="52" width="226" height="116" rx="9"/>
+          <path class="flap flap-back" d="M14 52 Q125 52 236 52 L134 116 Q125 122 116 116 Z"/>
+          <g class="letter">
+            <rect class="paper" x="36" y="22" width="178" height="112" rx="5"/>
+            <text id="ext" x="52" y="46">PDF</text>
+            <line class="ln" x1="52" y1="62" x2="186" y2="62"/>
+            <line class="ln" x1="52" y1="76" x2="170" y2="76"/>
+            <line class="ln" x1="52" y1="90" x2="180" y2="90"/>
+            <line class="ln" x1="52" y1="104" x2="140" y2="104"/>
+          </g>
+          <path class="front" d="M12 60 L118 124 Q125 128 132 124 L238 60 L238 159 Q238 168 229 168 L21 168 Q12 168 12 159 Z"/>
+          <path class="front-edge" d="M14 166 L110 104 M236 166 L140 104"/>
+          <path class="flap flap-front" d="M14 52 Q125 52 236 52 L134 116 Q125 122 116 116 Z"/>
+          <g class="seal">
+            <g class="half half-l" clip-path="url(#cl)">
+              <path class="wax" id="waxpath" d=""/>
+              <circle class="ring" cx="125" cy="114" r="15"/>
+              <path class="mark" d="M125 105.5a4.2 4.2 0 0 1 2.4 7.6l1.6 8.4h-8l1.6-8.4a4.2 4.2 0 0 1 2.4-7.6z"/>
+              <ellipse class="hi" cx="118" cy="105" rx="6" ry="3" transform="rotate(-30 118 105)"/>
+            </g>
+            <g class="half half-r" clip-path="url(#cr)">
+              <use href="#waxpath" class="wax"/>
+              <circle class="ring" cx="125" cy="114" r="15"/>
+              <path class="mark" d="M125 105.5a4.2 4.2 0 0 1 2.4 7.6l1.6 8.4h-8l1.6-8.4a4.2 4.2 0 0 1 2.4-7.6z"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <!-- idle -->
+      <div class="pane" data-pane="idle">
+        <div class="head">
+          <h1 id="idleTitle">Перетащите файл сюда</h1>
+          <p>Обычный файл зашифруем, файл .age откроем</p>
+        </div>
+        <div class="actions"><button class="btn" id="pick">Выбрать файл<kbd class="k-open">⌘O</kbd></button></div>
+        <div class="footnote">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="5.5" width="8" height="5" rx="1.2"/><path d="M4 5.5V4a2 2 0 0 1 4 0v1.5"/></svg>
+          Файлы не покидают этот компьютер
+        </div>
+      </div>
+
+      <!-- compose (encrypt) -->
+      <div class="pane" data-pane="compose" hidden>
+        <div class="fileline"><span class="name" data-bind="name"></span><span class="size" data-bind="size"></span><button class="x" data-act="reset" aria-label="Убрать файл">×</button></div>
+        <div class="seg" role="radiogroup" aria-label="Способ шифрования">
+          <button role="radio" aria-checked="true" data-mode="pass">Паролем</button>
+          <button role="radio" aria-checked="false" data-mode="key">Для получателя</button>
+        </div>
+
+        <div data-modepane="pass">
+          <label class="field"><span>Пароль</span>
+            <div class="inputwrap"><input class="input" id="p1" type="password" autocomplete="new-password" spellcheck="false"><button class="inbtn" data-act="peek" type="button">Показать</button></div>
+          </label>
+          <div class="meter" id="meter" data-l="0"><i></i><i></i><i></i><i></i></div>
+          <div class="hint"><span id="strength">Несколько слов надёжнее значков</span><button type="button" data-act="gen">Придумать</button></div>
+          <label class="field" style="margin-top:6px"><span>Повторите пароль</span>
+            <input class="input" id="p2" type="password" autocomplete="new-password" spellcheck="false">
+          </label>
+          <div class="err" id="mismatch"></div>
+          <div class="warn"><svg viewBox="0 0 14 14" fill="currentColor"><path d="M7 1.2 13.2 12H.8L7 1.2zm-.6 4v3.4h1.2V5.2H6.4zm0 4.4v1.2h1.2V9.6H6.4z"/></svg>Пароль нельзя восстановить. Без него файл не откроет никто, включая вас.</div>
+        </div>
+
+        <div data-modepane="key" hidden>
+          <div class="people" id="people" role="group" aria-label="Получатели"></div>
+          <button class="linkbtn" data-act="tab-keys" type="button">Добавить получателя</button>
+          <div style="height:12px"></div>
+        </div>
+
+        <label class="toggle"><input type="checkbox" id="trash"> Убрать оригинал в корзину</label>
+        <div class="err" id="composeErr" role="alert"></div>
+        <div class="spacer"></div>
+        <div class="actions"><button class="btn primary" id="seal" disabled>Запечатать</button></div>
+      </div>
+
+      <!-- working -->
+      <div class="pane" data-pane="working" hidden>
+        <div class="head"><h1 id="workTitle">Запечатываем…</h1><p data-bind="name"></p></div>
+        <div class="progress"><i id="bar"></i></div>
+        <div class="center-note" id="workNote"></div>
+      </div>
+
+      <!-- done -->
+      <div class="pane" data-pane="done" hidden>
+        <div class="head"><h1 id="doneTitle">Запечатано</h1><p id="doneSub"></p></div>
+        <div class="result">
+          <div class="ico"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></div>
+          <div style="min-width:0"><div class="name selectable" id="outName"></div><div class="meta" id="outMeta"></div></div>
+        </div>
+        <div class="center-note" id="renameNote" hidden>Файл с таким именем уже был, поэтому добавили номер</div>
+        <div class="spacer"></div>
+        <div class="actions">
+          <button class="btn" data-act="reveal" id="revealBtn">Показать в Finder</button>
+          <button class="btn primary" data-act="reset" id="againBtn">Запечатать ещё</button>
+        </div>
+      </div>
+
+      <!-- open (decrypt) -->
+      <div class="pane" data-pane="open" hidden>
+        <div class="fileline"><span class="name" data-bind="name"></span><span class="size" data-bind="size"></span><button class="x" data-act="reset" aria-label="Убрать файл">×</button></div>
+        <div data-openmode="pass">
+          <div class="head" style="text-align:left;margin-bottom:10px"><p>Этот конверт запечатан паролем</p></div>
+          <label class="field"><span>Пароль</span>
+            <div class="inputwrap"><input class="input" id="op" type="password" autocomplete="current-password" spellcheck="false"><button class="inbtn" data-act="peek" type="button">Показать</button></div>
+          </label>
+        </div>
+        <div data-openmode="key" hidden>
+          <div class="result" style="margin-bottom:14px">
+            <div class="ico key"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.5" cy="8" r="3"/><path d="M8.5 8H14M12 8v2.5"/></svg></div>
+            <div><div class="name">Запечатано для вашего ключа</div><div class="meta" id="keyStoreNote">Пароль не нужен, ключ уже в Связке ключей</div></div>
+          </div>
+        </div>
+        <div data-openmode="foreign" hidden>
+          <div class="warn bad"><svg viewBox="0 0 14 14" fill="currentColor"><path d="M7 1.2 13.2 12H.8L7 1.2zm-.6 4v3.4h1.2V5.2H6.4zm0 4.4v1.2h1.2V9.6H6.4z"/></svg>Конверт запечатан для другого ключа. Попросите отправителя запечатать его заново для вашего ключа со вкладки «Ключи».</div>
+        </div>
+        <div class="err" id="openErr" role="alert"></div>
+        <div class="spacer"></div>
+        <div class="actions"><button class="btn primary" id="openBtn">Вскрыть</button></div>
+      </div>
+    </section>
+
+    <section class="view keys" id="v-keys">
+      <h2>Мой ключ</h2>
+      <div class="keybox">
+        <p>Отправьте его тем, кто будет шифровать файлы для вас. Ключ публичный, его можно пересылать открыто.</p>
+        <code id="mykey">…</code>
+        <div class="row"><button class="smallbtn" data-act="copy">Скопировать</button><span class="sub" id="storeNote">Секретная часть хранится в Связке ключей</span></div>
+      </div>
+      <h2 style="margin-top:20px">Получатели</h2>
+      <div class="people" id="contacts"></div>
+      <form class="addform" id="addform" hidden>
+        <label class="field"><span>Имя</span><input class="input" id="cName" maxlength="60" spellcheck="false"></label>
+        <label class="field"><span>Ключ</span><input class="input key-input" id="cKey" placeholder="age1…" spellcheck="false" autocomplete="off"></label>
+        <div class="err" id="addErr" role="alert"></div>
+        <div class="row"><button class="smallbtn" type="button" data-act="add-cancel">Отмена</button><button class="smallbtn primary" type="submit">Добавить</button></div>
+      </form>
+      <button class="linkbtn" data-act="add" type="button" id="addBtn">Добавить получателя</button>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
