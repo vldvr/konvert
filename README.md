@@ -13,6 +13,10 @@
   <a href="https://github.com/vldvr/konvert/releases/latest"><b>Скачать последнюю версию</b></a>
 </p>
 
+<p align="center">
+  <img src="docs/main.png" width="360" alt="Окно Конверта: перетащите файл сюда">
+</p>
+
 ## Что умеет
 
 **Шифрование паролем.** Пароль превращается в ключ через scrypt. Есть индикатор надёжности и генератор пароля из слов.
@@ -73,6 +77,7 @@ cd src-tauri && cargo test   # тесты ядра
 | `src-tauri/tauri.conf.json`, `capabilities/` | настройки окна, ассоциация `.age`, разрешения |
 | `scripts/build.mjs` | релизная сборка без локальных путей в бинарнике |
 | `.github/workflows/release.yml` | сборка установщиков в GitHub Actions |
+| `docs/` | скриншоты для README |
 
 **Выпуск версии.** Подними версию в `package.json`, `src-tauri/Cargo.toml` и `src-tauri/tauri.conf.json`, затем отправь тег:
 
